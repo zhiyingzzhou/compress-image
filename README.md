@@ -25,9 +25,6 @@ compressImage('inputDir','outputDir',{
 ```
 
 
-## API
-
-
 ## License
 
 MIT © [zhiyingzzhou](https://github.com/zhiyingzzhou)
