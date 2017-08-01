@@ -19,7 +19,7 @@ npm install --save-dev compress-image
 var compressImage = require('compress-image');
 
 compressImage('inputDir','outputDir',{
-	tinifyApiKey: 'xxxxxxx' // tinypng developer apikey
+	tinifyApiKey: 'xxxxxxx', // tinypng developer apikey
 	compresssPercent: 10 // limit compress scale
 });
 ```

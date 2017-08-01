@@ -20,7 +20,8 @@ let defaultOptions = {
 	compressPercent: 5
 }
 
-let firstInput;
+let firstInput,
+isInit = false;
 
 /**
  * @function compressImage
@@ -33,7 +34,7 @@ let firstInput;
 
 function compressImage(input,output='./.tinify',options=defaultOptions) {
 	const {compressPercent,tinifyApiKey} = options;
-	if(compressIndex === 0){
+	if(!isInit){
 		if(!tinifyApiKey){
 			log(chalk.red(
 				`tinifyApiKey is't null or undefined!`
@@ -55,6 +56,7 @@ function compressImage(input,output='./.tinify',options=defaultOptions) {
 			fileList[item].index = index;
 			fileList[item].path = item;
 		});
+		isInit = true;
 	}
 
 	/**
@@ -81,7 +83,7 @@ function compressImage(input,output='./.tinify',options=defaultOptions) {
 
 	function callBySelf() {
 		compressIndex ++ ;
-		if(compressIndex === fileArr.length) process.exit(1);
+		if(compressIndex === fileArr.length - 1) process.exit(1);
 		compressImage(firstInput,output,options);
 	}
 
@@ -127,6 +129,7 @@ function compressImage(input,output='./.tinify',options=defaultOptions) {
 		}else{
 			fileList[basename].size = parseInt(filesize(sourceData.length,0));
 			const resultData = yield tinifyPromise(sourceData);
+			
 			let optimizedFileSize = parseInt(filesize(resultData.length,0));
 			const optimizedPercent = caleOptimizePercent(fileList[basename].size,optimizedFileSize);
 
