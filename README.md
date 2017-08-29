@@ -9,7 +9,7 @@
 Install with [npm](https://npmjs.org/package/compress-image)
 
 ```
-npm install --save-dev compress-image
+npm install --save-dev compressimg
 ```
 
 
