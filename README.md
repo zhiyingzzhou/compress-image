@@ -16,7 +16,7 @@ npm install --save-dev compressimg
 ## Example
 
 ```js
-var compressImage = require('compress-image');
+var compressImage = require('compressimg');
 
 compressImage('inputDir','outputDir',{
 	tinifyApiKey: 'xxxxxxx', // tinypng developer apikey
