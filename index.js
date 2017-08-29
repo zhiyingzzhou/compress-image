@@ -11,13 +11,16 @@ const log = console.log;
 // 获取操作系统分隔符
 const sep = path.sep;
 
-let compressIndex = 0;
+let compressIndex = 0,
+compressCount = 0;
+
 // 文件列表
 let fileArr = [];
 let fileList = {};
 
 let defaultOptions = {
-	compressPercent: 5
+	compressPercent: 10, // 默认压缩限制比例
+	compressLimitCount: 5 // 默认压缩限制次数
 }
 
 let firstInput,
@@ -33,7 +36,8 @@ isInit = false;
  */
 
 function compressImage(input,output='./.tinify',options=defaultOptions) {
-	const {compressPercent,tinifyApiKey} = options;
+	++compressCount;
+	const {compressPercent,tinifyApiKey,compressLimitCount} = options;
 	if(!isInit){
 		if(!tinifyApiKey){
 			log(chalk.red(
@@ -83,7 +87,8 @@ function compressImage(input,output='./.tinify',options=defaultOptions) {
 
 	function callBySelf() {
 		compressIndex ++ ;
-		if(compressIndex === fileArr.length - 1) process.exit(1);
+		if(compressIndex === fileArr.length) process.exit(1);
+		compressCount = 0;
 		compressImage(firstInput,output,options);
 	}
 
@@ -108,10 +113,14 @@ function compressImage(input,output='./.tinify',options=defaultOptions) {
 	 * @param {string} fileObj[].path - 文件路径
 	 * @returns {void}
 	 */
-
+	
 	const tinifySync = async(function* ({ index, path:basename }){
+		log();
 		log(chalk.green(
 			`========== compressing ${basename} start! ==========`
+		));
+		log(chalk.green(
+			`========== ${basename} 第 ${compressCount} 次压缩! ==========`
 		));
 		// 获取文件名
 		const sourceData = fs.readFileSync(input+sep+basename);
@@ -125,13 +134,19 @@ function compressImage(input,output='./.tinify',options=defaultOptions) {
 			log(chalk.green(
 				`========== compress ${basename} end! ==========`
 			));
+			log();
 			callBySelf();
 		}else{
-			fileList[basename].size = parseInt(filesize(sourceData.length,0));
+			if(!fileList[basename].size){
+				fileList[basename].size = parseInt(filesize(sourceData.length,0));
+			}
+
 			const resultData = yield tinifyPromise(sourceData);
 			
 			let optimizedFileSize = parseInt(filesize(resultData.length,0));
 			const optimizedPercent = caleOptimizePercent(fileList[basename].size,optimizedFileSize);
+
+			fileList[basename].size = optimizedFileSize;
 
 			let outputFileName = output+sep+basename;
 			const writeResult = fs.writeFileSync(outputFileName,resultData);
@@ -142,7 +157,8 @@ function compressImage(input,output='./.tinify',options=defaultOptions) {
 			log(chalk.green(
 				`========== ${basename} compress scale percent: ${optimizedPercent}%`
 			));
-			if(optimizedPercent >= compressPercent) {
+			log();
+			if(optimizedPercent >= compressPercent && compressCount > compressLimitCount) {
 				compressImage(output,output,options);
 			}else{
 				callBySelf();
