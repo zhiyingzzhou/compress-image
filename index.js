@@ -88,7 +88,6 @@ function compressImage(input,output='./.tinify',options=defaultOptions) {
 	function callBySelf() {
 		compressIndex ++ ;
 		if(compressIndex === fileArr.length) process.exit(1);
-		compressCount = 0;
 		compressImage(firstInput,output,options);
 	}
 
@@ -158,9 +157,10 @@ function compressImage(input,output='./.tinify',options=defaultOptions) {
 				`========== ${basename} compress scale percent: ${optimizedPercent}%`
 			));
 			log();
-			if(optimizedPercent >= compressPercent && compressCount > compressLimitCount) {
+			if(optimizedPercent >= compressPercent && compressCount < compressLimitCount) {
 				compressImage(output,output,options);
 			}else{
+				compressCount = 0;
 				callBySelf();
 			}
 			
