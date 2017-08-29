@@ -20,7 +20,8 @@ var compressImage = require('compress-image');
 
 compressImage('inputDir','outputDir',{
 	tinifyApiKey: 'xxxxxxx', // tinypng developer apikey
-	compresssPercent: 10 // limit compress scale
+	compresssPercent: 10, // limit compress scale
+	compressLimitCount: 5 // limit compress count
 });
 ```
 
