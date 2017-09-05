@@ -12,7 +12,12 @@ const log = console.log;
 const sep = path.sep;
 
 let compressIndex = 0,
-	compressCount = 0;
+	compressCount = 0,
+	allowImgType = {
+		'image/png': true,
+		'image/jpeg': true,
+		'image/jpg': true
+	};
 
 // 文件列表
 let fileArr = [];
@@ -59,7 +64,7 @@ function compressImage(input, output = './.tinify', options = defaultOptions) {
 		if (fileArr.length === 0) {
 			log();
 			log(
-				chalk.red(`${input} directory has't any file!`)
+				chalk.red(`${input} directory does't have any file!`)
 			);
 			log();
 			process.exit(1);
@@ -134,7 +139,15 @@ function compressImage(input, output = './.tinify', options = defaultOptions) {
 		const sourceData = fs.readFileSync(input + sep + basename);
 		// 判断文件是否为图片
 		let info = imageinfo(sourceData);
-		const { type } = info;
+		const { type , mimeType } = info;
+		// 不是png,jpg,jpeg格式不压缩
+		if(!allowImgType[mimeType]){
+			log();
+			log(chalk.red('tinypng only allow png,jpg,jpeg format!'));
+			log();
+			compressCount = 0;
+			callBySelf();
+		}
 		if (!type) {
 			log(chalk.red(
 				`=================== ${basename} file type is't image format! ===================`
